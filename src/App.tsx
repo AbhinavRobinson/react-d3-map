@@ -4,20 +4,22 @@ import './App.css'
 
 const App: React.FC = () => {
 
-  const grid_constructor = () => {
-    var data = new Array()
-    var xpos = 1 //starting xpos and ypos at 1 so the stroke will show when we make the grid below
-    var ypos = 1
-    var width = 50
-    var height = 50
-    var click = 0
+  const map_constructor = React.useCallback(() => {
+    let data = new Array()
+    let xpos = 1 //starting xpos and ypos at 1 so the stroke will show when we make the grid below
+    let ypos = 1
+    let width = 50
+    let height = 50
+    let click = 0
+    let rows = 10
+    let cols = 10
 
     // iterate for rows	
-    for (var row = 0;row < 10;row++) {
+    for (let row = 0;row < rows;row++) {
       data.push(new Array())
 
       // iterate for cells/columns inside rows
-      for (var column = 0;column < 10;column++) {
+      for (var col = 0;col < cols;col++) {
         data[row].push({
           x: xpos,
           y: ypos,
@@ -33,33 +35,19 @@ const App: React.FC = () => {
       // increment the y position for the next row. Move it down 50 (height variable)
       ypos += height
     }
-    return data
-  }
 
-  const map_constructor = React.useCallback(() => {
-    // Create grid
-    var gridData = grid_constructor()
-    console.log(gridData)
-
-    // remove any older grids
-    d3.select("#map-grid").selectAll("svg").remove()
-    d3.selectAll(".row").remove()
-
-    // create new grid with svg
-    var grid = d3.select("#map-grid")
+    let grid = d3.select("#map-grid")
       .append("svg")
-      .attr("width", "510px")
-      .attr("height", "510px")
+      .attr("width", `${width * rows + 10}px`)
+      .attr("height", `${height * cols + 10}px`)
 
-    // add rows
-    var row = grid.selectAll(".row")
-      .data(gridData)
+    let row = grid.selectAll(".row")
+      .data(data)
       .enter().append("g")
       .attr("class", "row")
 
-    // add cells (columns)
-    var column = row.selectAll(".square")
-      .data(function (d) { return d })
+    let column = row.selectAll(".square")
+      .data(function (d: any) { return d })
       .enter().append("rect")
       .attr("class", "square")
       .attr("x", function (d: any) { return d.x })
@@ -68,14 +56,13 @@ const App: React.FC = () => {
       .attr("height", function (d: any) { return d.height })
       .style("fill", "#fff")
       .style("stroke", "#222")
-      .on('click', function (d: any) {
-        console.log("[pre-click]", this.style)
+      .on('click', function (d) {
+        console.log(d)
         d.click++
         if ((d.click) % 4 == 0) { d3.select(this).style("fill", "#fff") }
         if ((d.click) % 4 == 1) { d3.select(this).style("fill", "#2C93E8") }
         if ((d.click) % 4 == 2) { d3.select(this).style("fill", "#F56C4E") }
         if ((d.click) % 4 == 3) { d3.select(this).style("fill", "#838690") }
-        console.log("[post-click]", this.style)
       })
   }, [])
 
