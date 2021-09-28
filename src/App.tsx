@@ -6,11 +6,11 @@ const App: React.FC = () => {
 
   const map_constructor = React.useCallback(() => {
     let data = new Array()
-    let xpos = 1 //starting xpos and ypos at 1 so the stroke will show when we make the grid below
+    let xpos = 1
     let ypos = 1
     let width = 50
     let height = 50
-    let click = 0
+    let value = 0
     let rows = 10
     let cols = 10
 
@@ -21,11 +21,13 @@ const App: React.FC = () => {
       // iterate for cells/columns inside rows
       for (var col = 0;col < cols;col++) {
         data[row].push({
+          i: col,
+          j: row,
           x: xpos,
           y: ypos,
           width: width,
           height: height,
-          click: click
+          value: value
         })
         // increment the x position. I.e. move it over by 50 (width variable)
         xpos += width
@@ -52,18 +54,17 @@ const App: React.FC = () => {
       .attr("class", "square")
       .attr("x", function (d: any) { return d.x })
       .attr("y", function (d: any) { return d.y })
+      .attr("i", function (d: any) { return d.i })
+      .attr("j", function (d: any) { return d.j })
+      .attr("value", function (d: any) { return d.value })
       .attr("width", function (d: any) { return d.width })
       .attr("height", function (d: any) { return d.height })
       .style("fill", "#fff")
       .style("stroke", "#222")
-      .on('click', function (d) {
-        console.log(d)
-        d.click++
-        if ((d.click) % 4 == 0) { d3.select(this).style("fill", "#fff") }
-        if ((d.click) % 4 == 1) { d3.select(this).style("fill", "#2C93E8") }
-        if ((d.click) % 4 == 2) { d3.select(this).style("fill", "#F56C4E") }
-        if ((d.click) % 4 == 3) { d3.select(this).style("fill", "#838690") }
-      })
+
+    d3.selectAll("rect").on("click", (e: MouseEvent) => {
+      console.log(e.target)
+    })
   }, [])
 
   React.useEffect(() => {
