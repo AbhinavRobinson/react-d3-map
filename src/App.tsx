@@ -37,19 +37,27 @@ const App: React.FC = () => {
   }
 
   const map_constructor = React.useCallback(() => {
+    // Create grid
     var gridData = grid_constructor()
     console.log(gridData)
 
+    // remove any older grids
+    d3.select("#map-grid").selectAll("svg").remove()
+    d3.selectAll(".row").remove()
+
+    // create new grid with svg
     var grid = d3.select("#map-grid")
       .append("svg")
       .attr("width", "510px")
       .attr("height", "510px")
 
+    // add rows
     var row = grid.selectAll(".row")
       .data(gridData)
       .enter().append("g")
       .attr("class", "row")
 
+    // add cells (columns)
     var column = row.selectAll(".square")
       .data(function (d) { return d })
       .enter().append("rect")
@@ -61,12 +69,13 @@ const App: React.FC = () => {
       .style("fill", "#fff")
       .style("stroke", "#222")
       .on('click', function (d: any) {
-        console.log(d)
+        console.log("[pre-click]", this.style)
         d.click++
         if ((d.click) % 4 == 0) { d3.select(this).style("fill", "#fff") }
         if ((d.click) % 4 == 1) { d3.select(this).style("fill", "#2C93E8") }
         if ((d.click) % 4 == 2) { d3.select(this).style("fill", "#F56C4E") }
         if ((d.click) % 4 == 3) { d3.select(this).style("fill", "#838690") }
+        console.log("[post-click]", this.style)
       })
   }, [])
 
