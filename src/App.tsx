@@ -13,7 +13,7 @@ const App: React.FC = () => {
   // Map Constructor
   const mapConstructor = React.useCallback(() => {
     let data = new Array()
-    let initPlots = new Array()
+    let initPlots: number[][] = new Array() // initPlots[x][y] = value for plot x,y
     let xpos = 1
     let ypos = 1
     let width = 10
@@ -52,7 +52,7 @@ const App: React.FC = () => {
       .enter().append("g")
       .attr("class", "row")
 
-    let column = row.selectAll(".square")
+    row.selectAll(".square")
       .data(function (d: any) { return d })
       .enter().append("rect")
       .attr("class", function (d: any) { return `${d.i}-${d.j}` })
