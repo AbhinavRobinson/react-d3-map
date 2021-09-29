@@ -1,14 +1,23 @@
-import * as d3 from 'd3'
 import React from 'react'
 import './App.css'
+
+import * as d3 from 'd3'
+
 import { setInitialState, setPlotState } from './redux/functions/plotState/plotStateSlice'
 import { useAppDispatch, useAppSelector } from './redux/hooks'
 
 const App: React.FC = () => {
+  let rows = 125
+  let cols = 125
+
   // plot state
   const plotState = useAppSelector((state) => state.plot.value)
   // dispatcher
   const dispatch = useAppDispatch()
+  // data init done state
+  const [dataInitFinished, setDataInitFinished] = React.useState(false)
+  // init done state
+  const [mapInitFinished, setMapInitFinished] = React.useState(false)
 
   // Map Constructor
   const mapConstructor = React.useCallback(() => {
@@ -16,11 +25,9 @@ const App: React.FC = () => {
     let initialPlotState: number[][] = new Array() // state[x][y] = value for plot x,y
     let xpos = 1
     let ypos = 1
-    let width = 10
-    let height = 10
+    let width = 7
+    let height = 7
     let value = 0
-    let rows = 150
-    let cols = 150
 
     for (let row = 0;row < rows;row++) {
       data.push(new Array())
@@ -64,9 +71,11 @@ const App: React.FC = () => {
       .attr("height", function (d: any) { return d.height })
       .style("fill", "#fff")
       .style("stroke", "#111")
+
+    setDataInitFinished(true)
   }, [])
 
-  // add listener to plot
+  // add listener to plots
   const addListeners = React.useCallback(async () => {
     d3.selectAll("rect").on("mouseover", function (e: MouseEvent) {
       // @ts-ignore
@@ -78,7 +87,6 @@ const App: React.FC = () => {
       if (plotState[x][y] === 1) { d3.select(this).style("fill", "#0f0") }
       if (plotState[x][y] === 2) { d3.select(this).style("fill", "#00f") }
       if (plotState[x][y] === 3) { d3.select(this).style("fill", "#fff") }
-      console.log('plotValue', plotState[x][y])
     })
   }, [plotState])
 
@@ -89,8 +97,12 @@ const App: React.FC = () => {
 
   // Add Listeners
   React.useEffect(() => {
-    addListeners()
-  }, [plotState, addListeners])
+    if (!mapInitFinished && dataInitFinished) {
+      console.log("[Adding Listeners]")
+      addListeners()
+      setMapInitFinished(true)
+    }
+  }, [plotState, addListeners, mapInitFinished, dataInitFinished])
 
   return (
     <div className="App">
