@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import React from 'react'
 import './App.css'
-import { setPlotState } from './redux/functions/plotState/plotStateSlice'
+import { setInitialState, setPlotState } from './redux/functions/plotState/plotStateSlice'
 import { useAppDispatch, useAppSelector } from './redux/hooks'
 
 const App: React.FC = () => {
@@ -13,7 +13,7 @@ const App: React.FC = () => {
   // Map Constructor
   const mapConstructor = React.useCallback(() => {
     let data = new Array()
-    let initPlots: number[][] = new Array() // initPlots[x][y] = value for plot x,y
+    let initialPlotState: number[][] = new Array() // state[x][y] = value for plot x,y
     let xpos = 1
     let ypos = 1
     let width = 10
@@ -24,7 +24,7 @@ const App: React.FC = () => {
 
     for (let row = 0;row < rows;row++) {
       data.push(new Array())
-      initPlots.push(new Array())
+      initialPlotState.push(new Array())
       for (var col = 0;col < cols;col++) {
         data[row].push({
           i: col,
@@ -36,11 +36,13 @@ const App: React.FC = () => {
           value: value
         })
         xpos += width
-        initPlots[row].push(0)
+        initialPlotState[row].push(0)
       }
       xpos = 1
       ypos += height
     }
+
+    dispatch(setInitialState({ value: initialPlotState }))
 
     let grid = d3.select("#map-grid")
       .append("svg")
@@ -66,12 +68,17 @@ const App: React.FC = () => {
 
   // add listener to plot
   const addListeners = React.useCallback(async () => {
-    d3.selectAll("rect").on("mouseover", function () {
-      dispatch(setPlotState())
-      if (plotState === 0) { d3.select(this).style("fill", "#f00") }
-      if (plotState === 1) { d3.select(this).style("fill", "#0f0") }
-      if (plotState === 2) { d3.select(this).style("fill", "#00f") }
-      if (plotState === 3) { d3.select(this).style("fill", "#fff") }
+    d3.selectAll("rect").on("mouseover", function (e: MouseEvent) {
+      // @ts-ignore
+      const x = d3.select(this).attr("class").split("-")[0] as number
+      // @ts-ignore
+      const y = d3.select(this).attr("class").split("-")[1] as number
+      dispatch(setPlotState({ i: x, j: y }))
+      if (plotState[x][y] === 0) { d3.select(this).style("fill", "#f00") }
+      if (plotState[x][y] === 1) { d3.select(this).style("fill", "#0f0") }
+      if (plotState[x][y] === 2) { d3.select(this).style("fill", "#00f") }
+      if (plotState[x][y] === 3) { d3.select(this).style("fill", "#fff") }
+      console.log('plotValue', plotState[x][y])
     })
   }, [plotState])
 
@@ -83,7 +90,6 @@ const App: React.FC = () => {
   // Add Listeners
   React.useEffect(() => {
     addListeners()
-    console.log('plotValue', plotState)
   }, [plotState, addListeners])
 
   return (
