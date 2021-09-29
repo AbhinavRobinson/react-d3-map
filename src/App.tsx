@@ -1,8 +1,12 @@
 import * as d3 from 'd3'
 import React from 'react'
 import './App.css'
+import { setPlotState } from './redux/functions/plotState/plotStateSlice'
+import { useAppDispatch, useAppSelector } from './redux/hooks'
 
 const App: React.FC = () => {
+  const plotValue = useAppSelector((state) => state.plot.value)
+  const dispatch = useAppDispatch()
 
   const map_constructor = React.useCallback(() => {
     let data = new Array()
@@ -53,14 +57,22 @@ const App: React.FC = () => {
       .style("fill", "#fff")
       .style("stroke", "#222")
 
-    d3.selectAll("rect").on("click", (e: MouseEvent) => {
-      console.log(e.target)
+    d3.selectAll("rect").on("click", function (e: MouseEvent) {
+      dispatch(setPlotState())
+      if (plotValue === 0) { d3.select(this).style("fill", "#f00") }
+      if (plotValue === 1) { d3.select(this).style("fill", "#0f0") }
+      if (plotValue === 2) { d3.select(this).style("fill", "#00f") }
+      if (plotValue === 3) { d3.select(this).style("fill", "#fff") }
     })
   }, [])
 
   React.useEffect(() => {
     map_constructor()
   }, [])
+
+  React.useEffect(() => {
+    console.log('plotValue', plotValue)
+  }, [plotValue])
 
   return (
     <div className="App">

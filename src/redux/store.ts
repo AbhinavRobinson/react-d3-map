@@ -1,7 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
+import plotReducer from './functions/plotState/plotStateSlice'
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    plot: plotReducer,
+  },
 })
 
 export type RootState = ReturnType<typeof store.getState>
