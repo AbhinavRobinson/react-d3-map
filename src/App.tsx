@@ -5,11 +5,15 @@ import { setPlotState } from './redux/functions/plotState/plotStateSlice'
 import { useAppDispatch, useAppSelector } from './redux/hooks'
 
 const App: React.FC = () => {
-  const plotValue = useAppSelector((state) => state.plot.value)
+  // plot state
+  const plotState = useAppSelector((state) => state.plot.value)
+  // dispatcher
   const dispatch = useAppDispatch()
 
-  const map_constructor = React.useCallback(() => {
+  // Map Constructor
+  const mapConstructor = React.useCallback(() => {
     let data = new Array()
+    let initPlots = new Array()
     let xpos = 1
     let ypos = 1
     let width = 10
@@ -20,6 +24,7 @@ const App: React.FC = () => {
 
     for (let row = 0;row < rows;row++) {
       data.push(new Array())
+      initPlots.push(new Array())
       for (var col = 0;col < cols;col++) {
         data[row].push({
           i: col,
@@ -31,6 +36,7 @@ const App: React.FC = () => {
           value: value
         })
         xpos += width
+        initPlots[row].push(0)
       }
       xpos = 1
       ypos += height
@@ -58,20 +64,27 @@ const App: React.FC = () => {
       .style("stroke", "#111")
   }, [])
 
-  React.useEffect(() => {
-    map_constructor()
-  }, [])
-
-  React.useEffect(() => {
+  // add listener to plot
+  const addListeners = React.useCallback(async () => {
     d3.selectAll("rect").on("mouseover", function () {
       dispatch(setPlotState())
-      if (plotValue === 0) { d3.select(this).style("fill", "#f00") }
-      if (plotValue === 1) { d3.select(this).style("fill", "#0f0") }
-      if (plotValue === 2) { d3.select(this).style("fill", "#00f") }
-      if (plotValue === 3) { d3.select(this).style("fill", "#fff") }
+      if (plotState === 0) { d3.select(this).style("fill", "#f00") }
+      if (plotState === 1) { d3.select(this).style("fill", "#0f0") }
+      if (plotState === 2) { d3.select(this).style("fill", "#00f") }
+      if (plotState === 3) { d3.select(this).style("fill", "#fff") }
     })
-    console.log('plotValue', plotValue)
-  }, [plotValue])
+  }, [plotState])
+
+  // Init Map
+  React.useEffect(() => {
+    mapConstructor()
+  }, [mapConstructor])
+
+  // Add Listeners
+  React.useEffect(() => {
+    addListeners()
+    console.log('plotValue', plotState)
+  }, [plotState, addListeners])
 
   return (
     <div className="App">
