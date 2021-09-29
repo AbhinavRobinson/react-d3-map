@@ -14,11 +14,8 @@ const App: React.FC = () => {
     let rows = 10
     let cols = 10
 
-    // iterate for rows	
     for (let row = 0;row < rows;row++) {
       data.push(new Array())
-
-      // iterate for cells/columns inside rows
       for (var col = 0;col < cols;col++) {
         data[row].push({
           i: col,
@@ -29,12 +26,9 @@ const App: React.FC = () => {
           height: height,
           value: value
         })
-        // increment the x position. I.e. move it over by 50 (width variable)
         xpos += width
       }
-      // reset the x position after a row is complete
       xpos = 1
-      // increment the y position for the next row. Move it down 50 (height variable)
       ypos += height
     }
 
@@ -51,12 +45,9 @@ const App: React.FC = () => {
     let column = row.selectAll(".square")
       .data(function (d: any) { return d })
       .enter().append("rect")
-      .attr("class", "square")
+      .attr("class", function (d: any) { return `${d.i}-${d.j}` })
       .attr("x", function (d: any) { return d.x })
       .attr("y", function (d: any) { return d.y })
-      .attr("i", function (d: any) { return d.i })
-      .attr("j", function (d: any) { return d.j })
-      .attr("value", function (d: any) { return d.value })
       .attr("width", function (d: any) { return d.width })
       .attr("height", function (d: any) { return d.height })
       .style("fill", "#fff")
