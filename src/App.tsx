@@ -12,11 +12,11 @@ const App: React.FC = () => {
     let data = new Array()
     let xpos = 1
     let ypos = 1
-    let width = 50
-    let height = 50
+    let width = 10
+    let height = 10
     let value = 0
-    let rows = 10
-    let cols = 10
+    let rows = 150
+    let cols = 150
 
     for (let row = 0;row < rows;row++) {
       data.push(new Array())
@@ -55,15 +55,7 @@ const App: React.FC = () => {
       .attr("width", function (d: any) { return d.width })
       .attr("height", function (d: any) { return d.height })
       .style("fill", "#fff")
-      .style("stroke", "#222")
-
-    d3.selectAll("rect").on("click", function (e: MouseEvent) {
-      dispatch(setPlotState())
-      if (plotValue === 0) { d3.select(this).style("fill", "#f00") }
-      if (plotValue === 1) { d3.select(this).style("fill", "#0f0") }
-      if (plotValue === 2) { d3.select(this).style("fill", "#00f") }
-      if (plotValue === 3) { d3.select(this).style("fill", "#fff") }
-    })
+      .style("stroke", "#111")
   }, [])
 
   React.useEffect(() => {
@@ -71,6 +63,13 @@ const App: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
+    d3.selectAll("rect").on("mouseover", function () {
+      dispatch(setPlotState())
+      if (plotValue === 0) { d3.select(this).style("fill", "#f00") }
+      if (plotValue === 1) { d3.select(this).style("fill", "#0f0") }
+      if (plotValue === 2) { d3.select(this).style("fill", "#00f") }
+      if (plotValue === 3) { d3.select(this).style("fill", "#fff") }
+    })
     console.log('plotValue', plotValue)
   }, [plotValue])
 
